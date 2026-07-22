@@ -51,22 +51,36 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         squashfs-tools \
         xorriso \
         grub-pc-bin \
-        grub-efi-amd64-bin
+        grub-efi-amd64-bin \
+        debian-archive-keyring \
+        debian-keyring
 fi
 
 # Clean previous build artifacts
 cd "$BUILD_DIR"
-log_info "Cleaning previous live-build state..."
+log_info "Cleaning previous live-build state and cache..."
 lb clean --all >/dev/null 2>&1 || true
+rm -rf cache .build config/bootstrap config/chroot config/common config/binary
 
 # Execute live-build config
 log_info "Configuring live-build recipe for Debian 13 Minimal..."
-if [ -f "./auto/config" ]; then
-    chmod +x ./auto/config
-    ./auto/config
-else
-    lb config --distribution trixie --architectures amd64 --binary-images iso-hybrid
-fi
+lb config \
+    --mode debian \
+    --system live \
+    --distribution trixie \
+    --architectures amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --parent-mirror-bootstrap "http://deb.debian.org/debian/" \
+    --parent-mirror-chroot "http://deb.debian.org/debian/" \
+    --mirror-bootstrap "http://deb.debian.org/debian/" \
+    --mirror-chroot "http://deb.debian.org/debian/" \
+    --debian-installer false \
+    --binary-images iso-hybrid \
+    --bootloader grub-efi \
+    --compression squashfs \
+    --iso-application "ToyamasOS Minimal Server" \
+    --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
+    --iso-volume "TOYAMASOS_1_0"
 
 # Execute live-build ISO compilation
 log_info "Building ToyamasOS rootfs, squashfs, and hybrid bootloader..."
