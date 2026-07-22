@@ -10,7 +10,6 @@ lb config noauto \
     --binary-images iso-hybrid \
     --bootloader grub-efi \
     --compression squashfs \
-    --zstd-compression true \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
     --iso-volume "TOYAMASOS_1_0" \
