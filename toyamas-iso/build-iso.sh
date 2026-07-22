@@ -74,7 +74,6 @@ lb config \
     --parent-mirror-chroot "http://deb.debian.org/debian/" \
     --mirror-bootstrap "http://deb.debian.org/debian/" \
     --mirror-chroot "http://deb.debian.org/debian/" \
-    --debootstrap-options "--include=coreutils,usr-is-merged,systemd --no-check-gpg" \
     --debian-installer false \
     --binary-images iso-hybrid \
     --bootloader grub-efi \
@@ -82,6 +81,9 @@ lb config \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
     --iso-volume "TOYAMASOS_1_0"
+
+# Inject debootstrap options directly to the config file to bypass command-line parsing bugs in Ubuntu's live-build
+echo 'LB_DEBOOTSTRAP_OPTIONS="--include=coreutils,usr-is-merged,systemd --no-check-gpg"' >> config/bootstrap
 
 # Execute live-build ISO compilation
 log_info "Building ToyamasOS rootfs, squashfs, and hybrid bootloader..."

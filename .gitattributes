@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Enforce Unix (LF) line endings for shell scripts to avoid WSL/Linux execution errors
+*.sh text eol=lf
