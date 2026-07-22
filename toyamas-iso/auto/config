@@ -1,0 +1,17 @@
+#!/bin/sh
+# ToyamasOS live-build configuration recipe
+# Target OS: Debian 13 (Trixie) Minimal x86_64
+
+lb config noauto \
+    --distribution trixie \
+    --architectures amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --debian-installer false \
+    --binary-images iso-hybrid \
+    --bootloader grub-efi \
+    --compression squashfs \
+    --zstd-compression true \
+    --iso-application "ToyamasOS Minimal Server" \
+    --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
+    --iso-volume "TOYAMASOS_1_0" \
+    "${@}"
