@@ -1,0 +1,40 @@
+# ToyamasOS 1.0 Minimal ISO Package List (Debian 13 Trixie)
+# Minimal Headless Server Stack (No GUI / Desktop Environment)
+
+# Kernel & Systemd Core
+linux-image-amd64
+linux-headers-amd64
+systemd
+systemd-sysv
+dbus
+udev
+
+# Bootloader & Filesystem
+grub-pc
+grub-efi-amd64
+efibootmgr
+squashfs-tools
+zram-tools
+
+# Essential Utilities
+curl
+git
+htop
+ca-certificates
+gnupg
+lsb-release
+procps
+sudo
+tar
+unzip
+wget
+
+# Networking & Security
+iproute2
+net-tools
+iptables
+ufw
+fail2ban
+
+# Container Runtime Prerequisites
+apt-transport-https

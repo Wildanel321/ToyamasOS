@@ -1,0 +1,11 @@
+[Unit]
+Description=ToyamasOS Automated Firstboot Setup Service
+After=network.target local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/local/bin/toyamas-firstboot.sh
+
+[Install]
+WantedBy=multi-user.target
