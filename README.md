@@ -2,7 +2,7 @@
 
 **ToyamasOS** is an open-source, high-performance minimal Linux distribution, web management dashboard, enterprise CLI suite, and custom bootable ISO builder designed for **Debian 13 (Trixie) Minimal**.
 
-Optimized specifically for low-resource cloud VPS instances (**1 GB RAM & 2 vCPUs**), ToyamasOS empowers self-hosters and developers to run Docker containers efficiently with zero system bloat.
+Optimized specifically for low-resource instances (**1 GB RAM & 2 CPUs**), ToyamasOS empowers self-hosters and developers to run Docker containers efficiently with zero system bloat.
 
 ---
 
