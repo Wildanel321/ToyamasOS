@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toyamas Panel - Server, App Store & AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    T
+                </div>
+                <span class="font-bold text-white tracking-tight text-lg">Toyamas Panel</span>
+            </div>
+
+            <!-- Tab Buttons -->
+            <nav class="flex items-center gap-1 bg-slate-800/60 p-1 rounded-xl border border-slate-700/60">
+                <button id="tabOverviewBtn" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all shadow">
+                    📊 Overview
+                </button>
+                <button id="tabAppStoreBtn" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all">
+                    🛍️ App Store
+                </button>
+                <button id="tabAIBtn" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1">
+                    <span>🤖</span> AI Assistant
+                </button>
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- WebSocket Connection Status Badge -->
+            <div id="wsStatus" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span id="wsStatusText">Connecting...</span>
+            </div>
+
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- SECTION 1: Overview Dashboard -->
+    <main id="sectionOverview" class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
+        <!-- Host Quick Overview Banner -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-900/60 border border-slate-800 p-4 rounded-2xl">
+            <div>
+                <div class="text-xs text-slate-400">Hostname</div>
+                <div id="hostName" class="text-sm font-semibold text-white truncate">-</div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400">OS / Kernel</div>
+                <div id="hostOS" class="text-sm font-semibold text-white truncate">-</div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400">System Uptime</div>
+                <div id="hostUptime" class="text-sm font-semibold text-white">-</div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400">CPU Load (1m, 5m, 15m)</div>
+                <div id="hostLoad" class="text-sm font-semibold text-emerald-400">-</div>
+            </div>
+        </div>
+
+        <!-- Metric Gauges (4 Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">CPU Usage</span>
+                    <span id="cpuPercent" class="text-xl font-bold text-emerald-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                    <div id="cpuBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="mt-3 text-xs text-slate-400 flex justify-between">
+                    <span>Cores: <strong id="cpuCores" class="text-slate-200">-</strong></span>
+                    <span>Status: <strong id="cpuState" class="text-emerald-400">Normal</strong></span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">RAM Usage</span>
+                    <span id="ramPercent" class="text-xl font-bold text-teal-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                    <div id="ramBar" class="bg-teal-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="mt-3 text-xs text-slate-400 flex justify-between">
+                    <span id="ramUsed">0 MB</span>
+                    <span id="ramTotal">/ 0 MB</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Disk Space</span>
+                    <span id="diskPercent" class="text-xl font-bold text-blue-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                    <div id="diskBar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="mt-3 text-xs text-slate-400 flex justify-between">
+                    <span id="diskUsed">0 GB</span>
+                    <span id="diskTotal">/ 0 GB</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Network I/O</span>
+                    <span class="text-xs font-medium text-slate-400">Rate/sec</span>
+                </div>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">↓ RX (Download):</span>
+                        <strong id="netRx" class="text-emerald-400">0 KB/s</strong>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">↑ TX (Upload):</span>
+                        <strong id="netTx" class="text-blue-400">0 KB/s</strong>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 flex justify-between">
+                    <span id="netTotalRx">Total RX: 0 MB</span>
+                    <span id="netTotalTx">Total TX: 0 MB</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-Time Metrics Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Realtime CPU History (%)
+                </h3>
+                <div class="h-56">
+                    <canvas id="cpuChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> Realtime RAM History (MB)
+                </h3>
+                <div class="h-56">
+                    <canvas id="ramChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Docker Containers & Linux Services Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>🐳</span> Docker Containers
+                    </h3>
+                    <span id="containerCount" class="text-xs px-2.5 py-1 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg">0 Running</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase text-slate-400 bg-slate-800/60 border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Container</th>
+                                <th class="p-3">Image</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="containerList" class="divide-y divide-slate-800/80">
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-slate-500">No active Docker containers detected.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>⚙️</span> System Services
+                    </h3>
+                    <button id="refreshSvcsBtn" class="text-xs text-emerald-400 hover:underline">Refresh</button>
+                </div>
+
+                <div id="serviceList" class="space-y-3">
+                    <div class="text-xs text-slate-500 text-center py-4">Loading system services...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SECTION 2: App Store -->
+    <main id="sectionAppStore" class="hidden max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🛍️</span> Toyamas App Store
+                </h2>
+                <p class="text-sm text-slate-400 mt-1">One-click Docker Compose template installer for self-hosted applications.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="text" id="appSearchInput" placeholder="Search applications..."
+                    class="px-4 py-2 bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+        </div>
+
+        <div id="appGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-12 text-slate-500">Loading App Store applications...</div>
+        </div>
+    </main>
+
+    <!-- SECTION 3: AI Assistant -->
+    <main id="sectionAIAssistant" class="hidden max-w-5xl mx-auto px-4 lg:px-8 py-6 space-y-6">
+        <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🤖</span> Toyamas AI Assistant
+                </h2>
+                <p class="text-sm text-slate-400 mt-1">Intelligent server management powered by local Ollama / Qwen model integration.</p>
+            </div>
+            <div id="aiEngineBadge" class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold rounded-full">
+                Engine: Active
+            </div>
+        </div>
+
+        <!-- Quick Prompts Suggestions -->
+        <div class="flex flex-wrap gap-2">
+            <button onclick="sendQuickPrompt('Deploy Laravel')" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-emerald-400 rounded-xl">
+                🚀 Deploy Laravel
+            </button>
+            <button onclick="sendQuickPrompt('Diagnosa RAM dan Service Mati')" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-teal-400 rounded-xl">
+                🔍 Diagnosa RAM & Service
+            </button>
+            <button onclick="sendQuickPrompt('Buat Backup Otomatis')" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-blue-400 rounded-xl">
+                💾 Buat Backup Snapshot
+            </button>
+        </div>
+
+        <!-- Chat Conversation Area -->
+        <div id="aiChatBox" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 h-[480px] overflow-y-auto space-y-4 shadow-xl">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 font-bold flex items-center justify-center text-sm">AI</div>
+                <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl text-sm leading-relaxed max-w-2xl">
+                    Halo! Saya **Toyamas AI Assistant**. Saya dapat membaca log server, menganalisis penggunaan RAM, mendeteksi service mati, serta membantu Anda men-deploy aplikasi (seperti Laravel, Nextcloud, dsb.) secara otomatis.
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Input Bar -->
+        <form id="aiPromptForm" class="flex gap-3">
+            <input type="text" id="aiInputPrompt" placeholder="Tuliskan perintah atau pertanyaan server Anda (misal: 'Deploy Laravel')..." required
+                class="flex-1 px-5 py-3.5 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-xl">
+            <button type="submit" id="aiSendBtn"
+                class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                <span>Kirim</span>
+            </button>
+        </form>
+    </main>
+
+    <!-- App Config Modal -->
+    <div id="appModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 id="modalAppName" class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>⚙️</span> Install Application
+                </h3>
+                <button id="modalCloseBtn" class="text-slate-400 hover:text-white">&times;</button>
+            </div>
+
+            <form id="modalInstallForm" class="space-y-4">
+                <input type="hidden" id="modalAppID" name="app_id">
+                <div id="modalEnvFields" class="space-y-3 max-h-60 overflow-y-auto pr-1"></div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" id="modalCancelBtn" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl">Cancel</button>
+                    <button type="submit" id="modalSubmitBtn" class="px-5 py-2 text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl shadow-lg shadow-emerald-500/20">Install Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "id": "uptime-kuma",
+  "name": "Uptime Kuma",
+  "version": "1.23",
+  "category": "Monitoring",
+  "icon": "⚡",
+  "description": "Fancy self-hosted website & service uptime monitoring tool with status pages.",
+  "default_port": 3001,
+  "env_vars": [
+    { "name": "PORT", "label": "Web Port", "default": "3001", "type": "number" }
+  ]
+}

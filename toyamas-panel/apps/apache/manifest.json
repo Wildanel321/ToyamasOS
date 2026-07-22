@@ -1,0 +1,12 @@
+{
+  "id": "apache",
+  "name": "Apache HTTP Server",
+  "version": "2.4",
+  "category": "Web Server",
+  "icon": "🪶",
+  "description": "Robust, open-source HTTP web server engine (httpd).",
+  "default_port": 8081,
+  "env_vars": [
+    { "name": "HTTP_PORT", "label": "HTTP Port", "default": "8081", "type": "number" }
+  ]
+}

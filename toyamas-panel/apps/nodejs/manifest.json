@@ -1,0 +1,13 @@
+{
+  "id": "nodejs",
+  "name": "NodeJS Stack",
+  "version": "20.x",
+  "category": "Development Stack",
+  "icon": "💚",
+  "description": "Node.js 20 LTS JavaScript runtime container environment for backend microservices.",
+  "default_port": 3000,
+  "env_vars": [
+    { "name": "PORT", "label": "Node App Port", "default": "3000", "type": "number" },
+    { "name": "NODE_ENV", "label": "Node Environment", "default": "production", "type": "text" }
+  ]
+}

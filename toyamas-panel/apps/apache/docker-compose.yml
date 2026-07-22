@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  toyamas-apache:
+    image: httpd:alpine
+    container_name: toyamas-apache
+    restart: always
+    ports:
+      - "${HTTP_PORT}:80"
+    volumes:
+      - ./htdocs:/usr/local/apache2/htdocs

@@ -1,0 +1,12 @@
+{
+  "id": "ollama",
+  "name": "Ollama AI Engine",
+  "version": "latest",
+  "category": "AI / ML",
+  "icon": "🤖",
+  "description": "Get up and running with Large Language Models (Qwen3, Llama3) locally.",
+  "default_port": 11434,
+  "env_vars": [
+    { "name": "OLLAMA_PORT", "label": "Ollama API Port", "default": "11434", "type": "number" }
+  ]
+}

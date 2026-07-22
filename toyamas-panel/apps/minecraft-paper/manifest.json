@@ -1,0 +1,14 @@
+{
+  "id": "minecraft-paper",
+  "name": "Minecraft Paper Server",
+  "version": "1.20.4",
+  "category": "Gaming",
+  "icon": "⛏️",
+  "description": "High-performance Minecraft Java Edition server powered by PaperMC engine.",
+  "default_port": 25565,
+  "env_vars": [
+    { "name": "SERVER_PORT", "label": "Minecraft Port", "default": "25565", "type": "number" },
+    { "name": "MAX_RAM", "label": "Max Memory (e.g. 1G)", "default": "1G", "type": "text" },
+    { "name": "EULA", "label": "Accept EULA (TRUE)", "default": "TRUE", "type": "text" }
+  ]
+}

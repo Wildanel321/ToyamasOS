@@ -1,0 +1,14 @@
+{
+  "id": "nextcloud",
+  "name": "Nextcloud",
+  "version": "28",
+  "category": "Cloud Storage",
+  "icon": "☁️",
+  "description": "Self-hosted productivity platform and personal cloud storage suite.",
+  "default_port": 8082,
+  "env_vars": [
+    { "name": "HTTP_PORT", "label": "Web Port", "default": "8082", "type": "number" },
+    { "name": "NEXTCLOUD_ADMIN_USER", "label": "Admin Username", "default": "admin", "type": "text" },
+    { "name": "NEXTCLOUD_ADMIN_PASSWORD", "label": "Admin Password", "default": "nextcloudpass123", "type": "password" }
+  ]
+}

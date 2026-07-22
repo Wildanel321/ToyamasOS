@@ -1,0 +1,12 @@
+{
+  "id": "nginx",
+  "name": "Nginx",
+  "version": "1.25",
+  "category": "Web Server",
+  "icon": "🌐",
+  "description": "High-performance HTTP web server, reverse proxy, and load balancer.",
+  "default_port": 80,
+  "env_vars": [
+    { "name": "HTTP_PORT", "label": "HTTP Port", "default": "80", "type": "number" }
+  ]
+}

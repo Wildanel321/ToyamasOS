@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  toyamas-mc-paper:
+    image: itzg/minecraft-server:latest
+    container_name: toyamas-mc-paper
+    restart: always
+    ports:
+      - "${SERVER_PORT}:25565"
+    environment:
+      TYPE: "PAPER"
+      EULA: "${EULA}"
+      MEMORY: "${MAX_RAM}"
+    volumes:
+      - ./data:/data

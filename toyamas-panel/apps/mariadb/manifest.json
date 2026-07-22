@@ -1,0 +1,16 @@
+{
+  "id": "mariadb",
+  "name": "MariaDB",
+  "version": "11.2",
+  "category": "Database",
+  "icon": "🦭",
+  "description": "High-performance MySQL-compatible relational database management system.",
+  "default_port": 3306,
+  "env_vars": [
+    { "name": "DB_PORT", "label": "Database Port", "default": "3306", "type": "number" },
+    { "name": "MYSQL_ROOT_PASSWORD", "label": "Root Password", "default": "toyamasroot123", "type": "password" },
+    { "name": "MYSQL_DATABASE", "label": "Database Name", "default": "toyamas_db", "type": "text" },
+    { "name": "MYSQL_USER", "label": "Database User", "default": "toyamas", "type": "text" },
+    { "name": "MYSQL_PASSWORD", "label": "User Password", "default": "toyamaspass123", "type": "password" }
+  ]
+}

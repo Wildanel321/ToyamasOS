@@ -1,0 +1,13 @@
+{
+  "id": "redis",
+  "name": "Redis",
+  "version": "7.2",
+  "category": "Database / Cache",
+  "icon": "🔴",
+  "description": "Ultra-fast in-memory data structure store used as a database, cache, and message broker.",
+  "default_port": 6379,
+  "env_vars": [
+    { "name": "REDIS_PORT", "label": "Redis Port", "default": "6379", "type": "number" },
+    { "name": "REDIS_PASSWORD", "label": "Redis Password", "default": "toyamasredis123", "type": "password" }
+  ]
+}

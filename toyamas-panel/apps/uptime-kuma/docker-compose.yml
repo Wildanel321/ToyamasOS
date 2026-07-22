@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  toyamas-uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: toyamas-uptime-kuma
+    restart: always
+    ports:
+      - "${PORT}:3001"
+    volumes:
+      - ./data:/app/data

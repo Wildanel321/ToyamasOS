@@ -1,0 +1,17 @@
+# ToyamasOS Fail2Ban Configuration
+# Target: Protect SSH against brute-force intrusion attempts
+
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+backend  = systemd
+banaction = ufw
+
+[sshd]
+enabled  = true
+port     = ssh
+logpath  = %(sshd_log)s
+backend  = %(sshd_backend)s
+maxretry = 3
+bantime  = 2h

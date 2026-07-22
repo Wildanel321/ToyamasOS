@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  toyamas-nodejs:
+    image: node:20-alpine
+    container_name: toyamas-nodejs
+    restart: always
+    user: "node"
+    working_dir: /home/node/app
+    ports:
+      - "${PORT}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=3000
+    volumes:
+      - ./app:/home/node/app
+    command: ["sh", "-c", "if [ -f package.json ]; then npm start; else echo 'No package.json found. Mount app code in ./app'; sleep infinity; fi"]

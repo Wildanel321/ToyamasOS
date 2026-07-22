@@ -1,0 +1,13 @@
+{
+  "id": "laravel",
+  "name": "Laravel Stack",
+  "version": "10.x",
+  "category": "Development Stack",
+  "icon": "🔴",
+  "description": "PHP 8.2 FPM web application stack with Nginx web server and MariaDB database.",
+  "default_port": 8000,
+  "env_vars": [
+    { "name": "APP_PORT", "label": "Application Port", "default": "8000", "type": "number" },
+    { "name": "DB_PASSWORD", "label": "MariaDB Password", "default": "laravel123", "type": "password" }
+  ]
+}

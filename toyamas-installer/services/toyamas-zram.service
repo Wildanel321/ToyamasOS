@@ -1,0 +1,13 @@
+[Unit]
+Description=ToyamasOS ZRAM Compressed Swap Initialization
+Documentation=https://github.com/Wildanel321/ToyamasOS
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/toyamas-zram-start
+ExecStop=/usr/local/bin/toyamas-zram-stop
+
+[Install]
+WantedBy=multi-user.target

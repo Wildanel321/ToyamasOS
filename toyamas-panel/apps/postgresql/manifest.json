@@ -1,0 +1,15 @@
+{
+  "id": "postgresql",
+  "name": "PostgreSQL",
+  "version": "16",
+  "category": "Database",
+  "icon": "🐘",
+  "description": "Powerful, open-source object-relational database system with strong reliability.",
+  "default_port": 5432,
+  "env_vars": [
+    { "name": "DB_PORT", "label": "Database Port", "default": "5432", "type": "number" },
+    { "name": "POSTGRES_DB", "label": "Database Name", "default": "toyamas_db", "type": "text" },
+    { "name": "POSTGRES_USER", "label": "Database User", "default": "toyamas", "type": "text" },
+    { "name": "POSTGRES_PASSWORD", "label": "Database Password", "default": "toyamaspostgres123", "type": "password" }
+  ]
+}
