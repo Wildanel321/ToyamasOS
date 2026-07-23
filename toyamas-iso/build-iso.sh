@@ -32,7 +32,7 @@ log_info "  ToyamasOS 1.0 Custom ISO Build Pipeline"
 log_info "========================================================"
 
 # Check Build Prerequisites
-PREREQS=(lb debootstrap mksquashfs xorriso)
+PREREQS=(lb debootstrap mksquashfs xorriso gpg curl)
 MISSING=()
 
 for tool in "${PREREQS[@]}"; do
@@ -53,8 +53,44 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         grub-pc-bin \
         grub-efi-amd64-bin \
         debian-archive-keyring \
-        debian-keyring
+        debian-keyring \
+        curl \
+        gnupg
 fi
+
+# Ensure Debian archive keyring is up to date with Debian 12 (Bookworm) and Debian 13 (Trixie) signing keys.
+# This is required if the build host is running Ubuntu or an older Debian version.
+log_info "Ensuring Debian archive keyring is up to date..."
+mkdir -p /usr/share/keyrings
+
+if [[ ! -f /usr/share/keyrings/debian-archive-keyring.gpg ]]; then
+    touch /usr/share/keyrings/debian-archive-keyring.gpg
+fi
+
+# Debian 13 (Trixie) Key ID: 762F67A0B2C39DE4
+# Debian 12 (Bookworm) Key ID: 8783D481
+DEBIAN_KEYS=(
+    "762F67A0B2C39DE4:13"
+    "8783D481:12"
+)
+
+for key_info in "${DEBIAN_KEYS[@]}"; do
+    IFS=":" read -r key_id key_version <<< "$key_info"
+    if ! gpg --no-default-keyring --keyring /usr/share/keyrings/debian-archive-keyring.gpg --list-keys "$key_id" >/dev/null 2>&1; then
+        log_info "Importing Debian $key_version signing key ($key_id) into keyring..."
+        tmp_key=$(mktemp)
+        if curl -sSL -o "$tmp_key" "https://ftp-master.debian.org/keys/archive-key-${key_version}.asc" || \
+           wget -qO "$tmp_key" "https://ftp-master.debian.org/keys/archive-key-${key_version}.asc"; then
+            gpg --no-default-keyring --keyring /usr/share/keyrings/debian-archive-keyring.gpg --import "$tmp_key"
+            log_success "Imported Debian $key_version signing key."
+        else
+            log_error "Failed to download Debian $key_version signing key."
+        fi
+        rm -f "$tmp_key"
+    else
+        log_info "Debian $key_version signing key ($key_id) already in keyring."
+    fi
+done
 
 # Clean previous build artifacts
 cd "$BUILD_DIR"
