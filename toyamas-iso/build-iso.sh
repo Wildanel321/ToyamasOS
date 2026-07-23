@@ -92,6 +92,13 @@ for key_info in "${DEBIAN_KEYS[@]}"; do
     fi
 done
 
+# Patch live-build's lb_chroot_linux-image script to find Contents-*.gz under the main/ component.
+# This fixes a 404 error when building Debian 12/13.
+if [[ -f /usr/lib/live/build/lb_chroot_linux-image ]]; then
+    log_info "Patching live-build lb_chroot_linux-image script for Debian 13 compatibility..."
+    sed -i 's|/Contents-${LB_ARCHITECTURES}.gz|/main/Contents-${LB_ARCHITECTURES}.gz|g' /usr/lib/live/build/lb_chroot_linux-image
+fi
+
 # Clean previous build artifacts
 cd "$BUILD_DIR"
 log_info "Cleaning previous live-build state and cache..."
