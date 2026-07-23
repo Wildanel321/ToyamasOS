@@ -96,9 +96,20 @@ done
 # This fixes a 404 error when building Debian 12/13.
 for script_path in /usr/lib/live/build/chroot_linux-image /usr/lib/live/build/lb_chroot_linux-image; do
     if [[ -f "$script_path" ]]; then
-        if ! grep -q "main/Contents-\${LB_ARCHITECTURES}" "$script_path"; then
+        # Revert any previous corrupted patching (e.g. if double main/ or {_AREA}/main/ was injected)
+        if grep -q -F 'main/main/Contents-${LB_ARCHITECTURES}' "$script_path"; then
+            log_info "Reverting double main/ in $(basename "$script_path")..."
+            sed -i 's|main/main/Contents-${LB_ARCHITECTURES}|main/Contents-${LB_ARCHITECTURES}|g' "$script_path"
+        fi
+        if grep -q -F '${_AREA}/main/Contents-${LB_ARCHITECTURES}' "$script_path"; then
+            log_info "Reverting area main/ insertion in $(basename "$script_path")..."
+            sed -i 's|\${_AREA}/main/Contents-\${LB_ARCHITECTURES}|\${_AREA}/Contents-\${LB_ARCHITECTURES}|g' "$script_path"
+        fi
+
+        # Only patch if the script has the unpatched direct path: dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}
+        if grep -q -F 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}' "$script_path"; then
             log_info "Patching live-build $(basename "$script_path") script for Debian 13 compatibility..."
-            sed -i 's|/Contents-${LB_ARCHITECTURES}|/main/Contents-${LB_ARCHITECTURES}|g' "$script_path"
+            sed -i 's|dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}|dists/${LB_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}|g' "$script_path"
         fi
     fi
 done
@@ -128,7 +139,8 @@ lb config \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
     --iso-volume "TOYAMASOS_1_0" \
-    --security false
+    --security false \
+    --apt-indices false
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in Ubuntu's live-build
 echo 'LB_DEBOOTSTRAP_OPTIONS="--include=coreutils,usr-is-merged,systemd --no-check-gpg"' >> config/bootstrap
