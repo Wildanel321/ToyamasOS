@@ -116,7 +116,8 @@ lb config \
     --compression squashfs \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
-    --iso-volume "TOYAMASOS_1_0"
+    --iso-volume "TOYAMASOS_1_0" \
+    --security false
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in Ubuntu's live-build
 echo 'LB_DEBOOTSTRAP_OPTIONS="--include=coreutils,usr-is-merged,systemd --no-check-gpg"' >> config/bootstrap

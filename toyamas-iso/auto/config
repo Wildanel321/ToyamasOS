@@ -19,6 +19,7 @@ lb config noauto \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
     --iso-volume "TOYAMASOS_1_0" \
+    --security false \
     "${@}"
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in live-build
