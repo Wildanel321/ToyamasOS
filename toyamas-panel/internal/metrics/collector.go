@@ -2,14 +2,12 @@ package metrics
 
 import (
 	"bufio"
-	"fmt"
 
 	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -192,30 +190,11 @@ func (c *Collector) getRAMStats() RAMStats {
 }
 
 func (c *Collector) getDiskStats() DiskStats {
-	var stat syscall.Statfs_t
-	path := "/"
-	if err := syscall.Statfs(path, &stat); err == nil {
-		total := stat.Blocks * uint64(stat.Bsize)
-		free := stat.Bavail * uint64(stat.Bsize)
-		used := total - free
-
-		totalGB := float64(total) / (1024 * 1024 * 1024)
-		usedGB := float64(used) / (1024 * 1024 * 1024)
-		freeGB := float64(free) / (1024 * 1024 * 1024)
-		percent := 0.0
-		if totalGB > 0 {
-			percent = (usedGB / totalGB) * 100.0
-		}
-
-		return DiskStats{
-			TotalGB: totalGB,
-			UsedGB:  usedGB,
-			FreeGB:  freeGB,
-			Percent: percent,
-		}
+	stats, err := getDiskStats("/")
+	if err != nil {
+		return DiskStats{TotalGB: 20.0, UsedGB: 5.0, FreeGB: 15.0, Percent: 25.0}
 	}
-
-	return DiskStats{TotalGB: 20.0, UsedGB: 5.0, FreeGB: 15.0, Percent: 25.0}
+	return stats
 }
 
 func (c *Collector) getNetworkStats() NetworkStats {

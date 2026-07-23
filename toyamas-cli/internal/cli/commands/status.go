@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"toyamas-cli/internal/printer"
 	"toyamas-cli/internal/tui"
@@ -47,9 +46,7 @@ func HandleStatus() {
 	}
 
 	diskFree := "unknown"
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs("/", &stat); err == nil {
-		freeGB := float64(stat.Bavail*uint64(stat.Bsize)) / (1024 * 1024 * 1024)
+	if freeGB, err := getDiskFreeGB("/"); err == nil {
 		diskFree = fmt.Sprintf("%.2f GB", freeGB)
 	}
 
