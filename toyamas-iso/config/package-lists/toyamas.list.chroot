@@ -10,8 +10,8 @@ dbus
 udev
 
 # Bootloader & Filesystem
-grub-pc
-grub-efi-amd64
+grub-pc-bin
+grub-efi-amd64-bin
 efibootmgr
 squashfs-tools
 zram-tools
