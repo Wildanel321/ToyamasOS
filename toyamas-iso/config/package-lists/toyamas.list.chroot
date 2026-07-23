@@ -6,6 +6,9 @@ linux-image-amd64
 linux-headers-amd64
 systemd
 systemd-sysv
+live-boot
+live-config
+live-config-systemd
 dbus
 udev
 
