@@ -21,6 +21,7 @@ lb config noauto \
     --iso-volume "TOYAMASOS_1_0" \
     --security false \
     --apt-indices false \
+    --initsystem systemd \
     "${@}"
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in live-build

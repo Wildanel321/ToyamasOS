@@ -140,7 +140,8 @@ lb config \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
     --iso-volume "TOYAMASOS_1_0" \
     --security false \
-    --apt-indices false
+    --apt-indices false \
+    --initsystem systemd
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in Ubuntu's live-build
 echo 'LB_DEBOOTSTRAP_OPTIONS="--include=coreutils,usr-is-merged,systemd --no-check-gpg"' >> config/bootstrap
