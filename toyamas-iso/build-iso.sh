@@ -58,7 +58,8 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         gnupg \
         syslinux-utils \
         syslinux-common \
-        isolinux
+        isolinux \
+        librsvg2-bin
 fi
 
 # Ensure Debian archive keyring is up to date with Debian 12 (Bookworm) and Debian 13 (Trixie) signing keys.
