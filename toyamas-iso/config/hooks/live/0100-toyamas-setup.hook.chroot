@@ -56,5 +56,6 @@ WantedBy=multi-user.target
 EOF
 
 systemctl enable toyamas-zram.service 2>/dev/null || true
+systemctl enable toyamas-firstboot.service 2>/dev/null || true
 
 echo "[TOYAMAS HOOK] Chroot customization completed."

@@ -131,12 +131,15 @@ if [[ -d /usr/share/live/build/bootloaders/isolinux ]]; then
 fi
 # Copy actual binaries to replace broken absolute symlinks from host templates
 if [[ -f /usr/lib/ISOLINUX/isolinux.bin ]]; then
+    rm -f config/bootloaders/isolinux/isolinux.bin
     cp /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/isolinux.bin
 fi
 if [[ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]]; then
+    rm -f config/bootloaders/isolinux/vesamenu.c32
     cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/vesamenu.c32
 fi
 if [[ -f /usr/lib/syslinux/modules/bios/menu.c32 ]]; then
+    rm -f config/bootloaders/isolinux/menu.c32
     cp /usr/lib/syslinux/modules/bios/menu.c32 config/bootloaders/isolinux/menu.c32
 fi
 # Overlay our custom isolinux config if it exists
