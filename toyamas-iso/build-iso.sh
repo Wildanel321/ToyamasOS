@@ -123,6 +123,27 @@ log_info "Cleaning previous live-build state and cache..."
 lb clean --all >/dev/null 2>&1 || true
 rm -rf cache .build config/bootstrap config/chroot config/common config/binary
 
+# Create custom local isolinux directory to fix broken host templates on Ubuntu Jammy
+log_info "Preparing custom isolinux bootloader template..."
+mkdir -p config/bootloaders/isolinux
+if [[ -d /usr/share/live/build/bootloaders/isolinux ]]; then
+    cp -r /usr/share/live/build/bootloaders/isolinux/* config/bootloaders/isolinux/
+fi
+# Copy actual binaries to replace broken absolute symlinks from host templates
+if [[ -f /usr/lib/ISOLINUX/isolinux.bin ]]; then
+    cp /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/isolinux.bin
+fi
+if [[ -f /usr/lib/syslinux/modules/bios/vesamenu.c32 ]]; then
+    cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/vesamenu.c32
+fi
+if [[ -f /usr/lib/syslinux/modules/bios/menu.c32 ]]; then
+    cp /usr/lib/syslinux/modules/bios/menu.c32 config/bootloaders/isolinux/menu.c32
+fi
+# Overlay our custom isolinux config if it exists
+if [[ -f config/bootloaders/isolinux.cfg ]]; then
+    cp config/bootloaders/isolinux.cfg config/bootloaders/isolinux/isolinux.cfg
+fi
+
 # Execute live-build config
 log_info "Configuring live-build recipe for Debian 13 Minimal..."
 lb config \
