@@ -22,6 +22,7 @@ lb config noauto \
     --security false \
     --apt-indices false \
     --initsystem systemd \
+    --memtest none \
     "${@}"
 
 # Inject debootstrap options directly to the config file to bypass command-line parsing bugs in live-build
