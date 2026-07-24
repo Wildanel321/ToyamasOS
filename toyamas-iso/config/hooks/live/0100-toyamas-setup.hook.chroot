@@ -59,7 +59,7 @@ systemctl enable toyamas-zram.service 2>/dev/null || true
 systemctl enable toyamas-firstboot.service 2>/dev/null || true
 
 # 5. Compatibility wrapper for legacy rsvg tool in modern Debian 13
-if [[ -f /usr/bin/rsvg-convert && ! -f /usr/bin/rsvg ]]; then
+if [ -f /usr/bin/rsvg-convert ] && [ ! -f /usr/bin/rsvg ]; then
     ln -sf /usr/bin/rsvg-convert /usr/bin/rsvg
 fi
 
