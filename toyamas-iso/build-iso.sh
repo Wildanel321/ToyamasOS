@@ -135,7 +135,7 @@ lb config \
     --mirror-chroot "http://deb.debian.org/debian/" \
     --debian-installer false \
     --binary-images iso-hybrid \
-    --bootloaders syslinux,grub-efi \
+    --bootloader syslinux \
     --compression squashfs \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
