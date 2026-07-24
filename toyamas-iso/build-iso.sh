@@ -56,7 +56,9 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         debian-keyring \
         curl \
         gnupg \
-        syslinux-utils
+        syslinux-utils \
+        syslinux-common \
+        isolinux
 fi
 
 # Ensure Debian archive keyring is up to date with Debian 12 (Bookworm) and Debian 13 (Trixie) signing keys.
