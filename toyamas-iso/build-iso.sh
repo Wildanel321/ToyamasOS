@@ -32,7 +32,7 @@ log_info "  ToyamasOS 1.0 Custom ISO Build Pipeline"
 log_info "========================================================"
 
 # Check Build Prerequisites
-PREREQS=(lb debootstrap mksquashfs xorriso gpg curl)
+PREREQS=(lb debootstrap mksquashfs xorriso gpg curl isohybrid)
 MISSING=()
 
 for tool in "${PREREQS[@]}"; do
@@ -55,7 +55,8 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         debian-archive-keyring \
         debian-keyring \
         curl \
-        gnupg
+        gnupg \
+        syslinux-utils
 fi
 
 # Ensure Debian archive keyring is up to date with Debian 12 (Bookworm) and Debian 13 (Trixie) signing keys.
@@ -134,7 +135,7 @@ lb config \
     --mirror-chroot "http://deb.debian.org/debian/" \
     --debian-installer false \
     --binary-images iso-hybrid \
-    --bootloader grub-efi \
+    --bootloaders syslinux,grub-efi \
     --compression squashfs \
     --iso-application "ToyamasOS Minimal Server" \
     --iso-publisher "ToyamasOS Team <https://github.com/Wildanel321/ToyamasOS>" \
