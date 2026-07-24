@@ -156,10 +156,10 @@ lb config \
     --distribution trixie \
     --architectures amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --parent-mirror-bootstrap "http://deb.debian.org/debian/" \
-    --parent-mirror-chroot "http://deb.debian.org/debian/" \
-    --mirror-bootstrap "http://deb.debian.org/debian/" \
-    --mirror-chroot "http://deb.debian.org/debian/" \
+    --parent-mirror-bootstrap "http://cdn-fastly.deb.debian.org/debian/" \
+    --parent-mirror-chroot "http://cdn-fastly.deb.debian.org/debian/" \
+    --mirror-bootstrap "http://cdn-fastly.deb.debian.org/debian/" \
+    --mirror-chroot "http://cdn-fastly.deb.debian.org/debian/" \
     --debian-installer false \
     --binary-images iso-hybrid \
     --bootloader syslinux \
