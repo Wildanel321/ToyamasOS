@@ -62,6 +62,46 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         librsvg2-bin
 fi
 
+# Create compatibility wrapper for legacy rsvg tool on host if needed
+if [[ -f /usr/bin/rsvg-convert ]] && [[ ! -f /usr/bin/rsvg ]]; then
+    log_info "Creating rsvg compatibility wrapper on host..."
+    cat <<'EOF' > /usr/bin/rsvg
+#!/bin/sh
+# Wrapper to translate legacy rsvg syntax to rsvg-convert
+args=""
+input=""
+output=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --format|--height|--width)
+            args="$args $1=$2"
+            shift 2
+            ;;
+        -*)
+            args="$args $1"
+            shift
+            ;;
+        *)
+            if [ -z "$input" ]; then
+                input="$1"
+            else
+                output="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [ -n "$output" ]; then
+    exec rsvg-convert $args -o "$output" "$input"
+else
+    exec rsvg-convert $args "$input"
+fi
+EOF
+    chmod +x /usr/bin/rsvg
+fi
+
+
 # Ensure Debian archive keyring is up to date with Debian 12 (Bookworm) and Debian 13 (Trixie) signing keys.
 # This is required if the build host is running Ubuntu or an older Debian version.
 log_info "Ensuring Debian archive keyring is up to date..."
@@ -112,17 +152,44 @@ for script_path in /usr/lib/live/build/chroot_linux-image /usr/lib/live/build/lb
 
         # Only patch if the script has the unpatched direct path: dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}
         if grep -q -F 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}' "$script_path"; then
-            log_info "Patching live-build $(basename "$script_path") script for Debian 13 compatibility..."
+            log_info "Patching target distribution Contents path in $(basename "$script_path")..."
             sed -i 's|dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}|dists/${LB_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}|g' "$script_path"
+        fi
+        if grep -q -F 'dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}' "$script_path"; then
+            log_info "Patching parent distribution Contents path in $(basename "$script_path")..."
+            sed -i 's|dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}|dists/${LB_PARENT_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}|g' "$script_path"
         fi
     fi
 done
+
+# Patch live-build's lb_binary_syslinux script to skip the bootlogo extraction if it does not exist.
+# This fixes a crash on Debian builds under Ubuntu live-build packages.
+if [[ -f /usr/lib/live/build/lb_binary_syslinux ]]; then
+    log_info "Patching live-build lb_binary_syslinux script for Debian compatibility..."
+    python3 -c '
+path = "/usr/lib/live/build/lb_binary_syslinux"
+with open(path, "r") as f:
+    text = f.read()
+if "if [ -e \"${_TARGET}/bootlogo\" ]" not in text and "bootlogo" in text:
+    text = text.replace("(cd \"$tmpdir\" && cpio -i) < ${_TARGET}/bootlogo", "if [ -e \"${_TARGET}/bootlogo\" ]; then\n(cd \"$tmpdir\" && cpio -i) < ${_TARGET}/bootlogo")
+    text = text.replace("rm -rf \"$tmpdir\"", "rm -rf \"$tmpdir\"\nfi")
+    with open(path, "w") as f:
+        f.write(text)
+'
+fi
+
+# Patch live-build's lb_binary_iso script to install syslinux-utils instead of syslinux in chroot.
+# In Debian 12/13, the isohybrid tool was moved from syslinux to syslinux-utils.
+if [[ -f /usr/lib/live/build/lb_binary_iso ]]; then
+    log_info "Patching live-build lb_binary_iso script for Debian 13 compatibility..."
+    sed -i 's|Check_package chroot/usr/bin/isohybrid syslinux|Check_package chroot/usr/bin/isohybrid syslinux-utils|g' /usr/lib/live/build/lb_binary_iso
+fi
 
 # Clean previous build artifacts
 cd "$BUILD_DIR"
 log_info "Cleaning previous live-build state and cache..."
 lb clean --all >/dev/null 2>&1 || true
-rm -rf cache .build config/bootstrap config/chroot config/common config/binary
+rm -rf cache .build config/bootstrap config/chroot config/common config/binary chroot
 
 # Create custom local isolinux directory to fix broken host templates on Ubuntu Jammy
 log_info "Preparing custom isolinux bootloader template..."
@@ -142,6 +209,18 @@ fi
 if [[ -f /usr/lib/syslinux/modules/bios/menu.c32 ]]; then
     rm -f config/bootloaders/isolinux/menu.c32
     cp /usr/lib/syslinux/modules/bios/menu.c32 config/bootloaders/isolinux/menu.c32
+fi
+if [[ -f /usr/lib/syslinux/modules/bios/ldlinux.c32 ]]; then
+    rm -f config/bootloaders/isolinux/ldlinux.c32
+    cp /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ldlinux.c32
+fi
+if [[ -f /usr/lib/syslinux/modules/bios/libcom32.c32 ]]; then
+    rm -f config/bootloaders/isolinux/libcom32.c32
+    cp /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/libcom32.c32
+fi
+if [[ -f /usr/lib/syslinux/modules/bios/libutil.c32 ]]; then
+    rm -f config/bootloaders/isolinux/libutil.c32
+    cp /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/libutil.c32
 fi
 # Overlay our custom isolinux config if it exists
 if [[ -f config/bootloaders/isolinux.cfg ]]; then

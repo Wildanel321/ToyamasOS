@@ -60,7 +60,44 @@ systemctl enable toyamas-firstboot.service 2>/dev/null || true
 
 # 5. Compatibility wrapper for legacy rsvg tool in modern Debian 13
 if [ -f /usr/bin/rsvg-convert ] && [ ! -f /usr/bin/rsvg ]; then
-    ln -sf /usr/bin/rsvg-convert /usr/bin/rsvg
+    cat <<'EOF' > /usr/bin/rsvg
+#!/bin/sh
+# Wrapper to translate legacy rsvg syntax to rsvg-convert
+args=""
+input=""
+output=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --format|--height|--width)
+            args="$args $1=$2"
+            shift 2
+            ;;
+        -*)
+            args="$args $1"
+            shift
+            ;;
+        *)
+            if [ -z "$input" ]; then
+                input="$1"
+            else
+                output="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [ -n "$output" ]; then
+    exec rsvg-convert $args -o "$output" "$input"
+else
+    exec rsvg-convert $args "$input"
 fi
+EOF
+    chmod +x /usr/bin/rsvg
+fi
+
+# 6. Disable APT privilege dropping to prevent write errors during binary stage package installation
+mkdir -p /etc/apt/apt.conf.d
+echo 'APT::Sandbox::User "root";' > /etc/apt/apt.conf.d/99sandbox.conf
 
 echo "[TOYAMAS HOOK] Chroot customization completed."
